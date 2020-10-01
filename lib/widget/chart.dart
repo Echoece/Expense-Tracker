@@ -35,26 +35,29 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 6,
-      margin: EdgeInsets.all(10),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //a list of groupedtransactionvalues which we traverse and make a test to see if we can print day and amount
-          children: groupedTransactionValues
-              .map((e) => Flexible(
-                    //flexible is used so that the amount doesnt take extra space when value gets too high
-                    fit: FlexFit.tight,
-                    child: ChartBar(
-                        e['day'],
-                        e['amount'],
-                        totalSpending == 0.0
-                            ? 0.0
-                            : (e['amount'] as double) / totalSpending),
-                  ))
-              .toList(),
+    return Container(
+      height: MediaQuery.of(context).size.height * .2,
+      child: Card(
+        elevation: 6,
+        margin: EdgeInsets.all(10),
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            //a list of groupedtransactionvalues which we traverse and make a test to see if we can print day and amount
+            children: groupedTransactionValues
+                .map((e) => Flexible(
+                      //flexible is used so that the amount doesnt take extra space when value gets too high
+                      fit: FlexFit.tight,
+                      child: ChartBar(
+                          e['day'],
+                          e['amount'],
+                          totalSpending == 0.0
+                              ? 0.0
+                              : (e['amount'] as double) / totalSpending),
+                    ))
+                .toList(),
+          ),
         ),
       ),
     );

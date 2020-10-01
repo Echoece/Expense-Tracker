@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ExpenseTracker/widget/chart.dart';
 import 'package:ExpenseTracker/widget/new_transaction.dart';
 import 'package:ExpenseTracker/widget/transaction_list.dart';
@@ -6,6 +8,12 @@ import 'package:flutter/material.dart';
 import 'model/Transaction.dart';
 
 void main() {
+  //code to fix the orientation to portraitonly
+  /*
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  */
   runApp(MyApp());
 }
 
@@ -57,6 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // Transaction('t2', 'new dress', 134.6, DateTime.now())
   ];
 
+  bool _showCharts = false;
+
   List<Transaction> get _recentTransaction {
     return _userTransaction
         .where((element) =>
@@ -81,33 +91,80 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        (MediaQuery.of(context).orientation == Orientation.landscape);
+    //small efficiency here, optional. This will make mediaquery only load once each build. and we can use that connection everywhere in the  method
+    final mediaquery = MediaQuery.of(context);
+    final appbar = AppBar(
+      title: Text(
+        'Personal Expenses',
+        style: TextStyle(fontFamily: 'OpenSans'),
+      ),
+      elevation: 5,
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => _startAddNewTransaction(context),
+        )
+      ],
+    );
+
+    final txListWidget = Container(
+        height: (MediaQuery.of(context).size.height -
+                appbar.preferredSize.height -
+                MediaQuery.of(context).padding.top) *
+            .7,
+        child: TransactionList(_userTransaction, _deleteTransaction));
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Personal Expenses',
-            style: TextStyle(fontFamily: 'OpenSans'),
-          ),
-          elevation: 5,
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => _startAddNewTransaction(context),
-            )
-          ],
-        ),
+        appBar: appbar,
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Chart(_recentTransaction),
-              TransactionList(_userTransaction, _deleteTransaction),
+              if (isLandscape)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Show Chart'),
+                    //some widget have the adaptive constructor. it takes same elements inside but difference is
+                    // we can get different looks for different platform. for example, this switch will be iOS looking
+                    // in iOS phones, and android looking in android phone
+                    Switch.adaptive(
+                        value: _showCharts,
+                        onChanged: (val) {
+                          setState(() {
+                            _showCharts = val;
+                          });
+                        }),
+                  ],
+                ),
+              if (!isLandscape)
+                Container(
+                    height: (mediaquery.size.height -
+                            appbar.preferredSize.height -
+                            mediaquery.padding.top) *
+                        .3,
+                    child: Chart(_recentTransaction)),
+              if (!isLandscape) txListWidget,
+              if (isLandscape)
+                _showCharts
+                    ? Container(
+                        height: (mediaquery.size.height -
+                                appbar.preferredSize.height -
+                                mediaquery.padding.top) *
+                            .7,
+                        child: Chart(_recentTransaction))
+                    : txListWidget
             ],
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _startAddNewTransaction(context),
-          child: Icon(Icons.add),
-        ));
+        //this checks for platform, if its in iOS it will not render the button. this check let us do variety of checks
+        floatingActionButton: Platform.isIOS
+            ? Container()
+            : FloatingActionButton(
+                onPressed: () => _startAddNewTransaction(context),
+                child: Icon(Icons.add),
+              ));
   }
 }

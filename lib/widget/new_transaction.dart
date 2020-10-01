@@ -58,48 +58,56 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(labelText: 'Title'),
-              controller: titleController,
-              keyboardType: TextInputType.text,
-              onSubmitted: (_) => submitData(),
-              //underscore here means, we accepting a parameter in this function, but we dont care about it.
-            ),
-            TextField(
-              decoration: InputDecoration(labelText: 'Amount'),
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              onSubmitted: (_) => submitData(),
-            ),
-            //datepicker elements inside this row
-            Row(
-              children: <Widget>[
-                Text(_selectDate == null
-                    ? 'No Date Choosen'
-                    : DateFormat.yMd().format(_selectDate)),
-                FlatButton(
-                    textColor: Theme.of(context).primaryColor,
-                    onPressed: presentDatePicker,
-                    child: Text(
-                      'Choose Date',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ))
-              ],
-            ),
-            RaisedButton(
-              onPressed: submitData,
-              color: Theme.of(context).primaryColor,
-              child: Text('Add Transaction'),
-              textColor: Theme.of(context).textTheme.button.color,
-            )
-          ],
+    return SingleChildScrollView(
+      //wrapped with single child scrollview, cause the modalbtoomsheet have its fixed height.
+      child: Card(
+        elevation: 10,
+        child: Container(
+          padding: EdgeInsets.only(
+              top: 10,
+              left: 10,
+              right: 10,
+              //viewinsets gives the parts of the UI that is taken by the system UI, typically like keyboard etc
+              bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              TextField(
+                decoration: InputDecoration(labelText: 'Title'),
+                controller: titleController,
+                keyboardType: TextInputType.text,
+                onSubmitted: (_) => submitData(),
+                //underscore here means, we accepting a parameter in this function, but we dont care about it.
+              ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Amount'),
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                onSubmitted: (_) => submitData(),
+              ),
+              //datepicker elements inside this row
+              Row(
+                children: <Widget>[
+                  Text(_selectDate == null
+                      ? 'No Date Choosen'
+                      : DateFormat.yMd().format(_selectDate)),
+                  FlatButton(
+                      textColor: Theme.of(context).primaryColor,
+                      onPressed: presentDatePicker,
+                      child: Text(
+                        'Choose Date',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ))
+                ],
+              ),
+              RaisedButton(
+                onPressed: submitData,
+                color: Theme.of(context).primaryColor,
+                child: Text('Add Transaction'),
+                textColor: Theme.of(context).textTheme.button.color,
+              )
+            ],
+          ),
         ),
       ),
     );

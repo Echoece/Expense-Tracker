@@ -10,27 +10,28 @@ class TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
       padding: EdgeInsets.all(10),
       child: _userTransaction.isEmpty
-          ? Column(
-              children: <Widget>[
-                Text(
-                  'No Data Yet',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  height: 200,
-                  child: Image.asset(
-                    'Assets/Image/waiting.png',
-                    fit: BoxFit.cover,
+          ? LayoutBuilder(builder: (ctx, constraints) {
+              return Column(
+                children: <Widget>[
+                  Text(
+                    'No Data Yet',
+                    style: Theme.of(context).textTheme.headline6,
                   ),
-                )
-              ],
-            )
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: constraints.maxHeight * .6,
+                    child: Image.asset(
+                      'Assets/Image/waiting.png',
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                ],
+              );
+            })
           //better use Listview builder, its better
           : ListView(
               children: (_userTransaction).map((e) {
@@ -56,11 +57,19 @@ class TransactionList extends StatelessWidget {
                     subtitle: Text(DateFormat.yMMMMd().format(e.date)),
                     // we could add  a trailing element here, which is the end element. usually we use it to
                     // put disposable button like delete etc
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Theme.of(context).errorColor,
-                      onPressed: () => _deleteTransaction(e.id),
-                    ),
+
+                    // the eternary expression checks if we have available width to put in some extra info.
+                    trailing: MediaQuery.of(context).size.width > 460
+                        ? FlatButton.icon(
+                            textColor: Theme.of(context).errorColor,
+                            onPressed: () => _deleteTransaction(e.id),
+                            icon: Icon(Icons.delete),
+                            label: Text('Delete'))
+                        : IconButton(
+                            icon: Icon(Icons.delete),
+                            color: Theme.of(context).errorColor,
+                            onPressed: () => _deleteTransaction(e.id),
+                          ),
                   ),
                 );
               }).toList(),
